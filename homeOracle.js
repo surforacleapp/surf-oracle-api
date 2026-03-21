@@ -5,6 +5,22 @@ import { getSurfRecommendationsV2 } from "./engineV2.js";
 import { deriveUserProfile } from "./userProfile.js";
 
 // ----------------------------
+// Helpers: Time + Date formatting
+// ----------------------------
+
+function formatTime(isoString) {
+  const date = new Date(isoString);
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+function formatDate(isoString) {
+  const date = new Date(isoString);
+  return date.toISOString().split("T")[0];
+}
+
+// ----------------------------
 // Oracle language (v1 locked)
 // ----------------------------
 
@@ -26,26 +42,13 @@ const whyShortMap = {
     "Clean, fun conditions during the best window of the day."
 };
 
-/**
- * @param {Array} forecast - normalized ForecastHour[]
- * @param {Object} rawUserProfile - raw onboarding answers
- */
 export function getHomeRecommendation(forecast, rawUserProfile) {
-  // 1. Derive user profile
   const userProfile = deriveUserProfile(rawUserProfile);
 
-  // 2. Run engine V2 (raw intelligence)
   const all = getSurfRecommendationsV2(forecast);
-
-  // 3. Sort by score (best relative conditions first)
   const sorted = [...all].sort((a, b) => b.score - a.score);
   const best = sorted[0];
 
-  console.log("Forecast length:", forecast.length);
-  console.log("Total scored results:", all.length);
-  console.log("Sorted length:", sorted.length);
-
-  // 4. Secondary time window (same spot, close score)
   const secondary = sorted.find(r =>
     r.spot === best.spot &&
     r.time !== best.time &&
@@ -53,7 +56,7 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
   );
 
   // ----------------------------
-  // ABSOLUTE GLOBAL DANGER LOGIC
+  // GLOBAL DANGER
   // ----------------------------
   const globalDanger =
     best.flags?.stormDay === true ||
@@ -61,16 +64,13 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
     best.energy >= 3000;
 
   // ----------------------------
-  // VERDICT DECISION (ORDER MATTERS)
+  // VERDICT
   // ----------------------------
   let verdictKey = "NO_GO";
 
-  // 1️⃣ Nobody should surf (overrides everything)
   if (globalDanger) {
     verdictKey = "NO_ONE";
   }
-
-  // 2️⃣ Beginner safety override
   else if (
     userProfile.level === "beginner" &&
     (
@@ -80,29 +80,22 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
   ) {
     verdictKey = "NO_GO";
   }
-
-  // 3️⃣ Normal decision logic (only if safe)
   else if (best.score >= 70) {
     verdictKey = "GO_NOW";
   }
   else if (best.score >= 40) {
     verdictKey = "GO";
   }
-  else {
-    verdictKey = "NO_GO";
-  }
 
   // ----------------------------
-  // UI RATING (0–5 stars)
+  // UI RATING
   // ----------------------------
   let displayRating = Math.round(best.score / 20);
 
-  // Never show high stars on danger days
   if (globalDanger) {
     displayRating = Math.min(displayRating, 2);
   }
 
-  // Protect beginners from misleading ratings
   if (
     userProfile.level === "beginner" &&
     verdictKey !== "GO_NOW"
@@ -111,12 +104,13 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
   }
 
   // ----------------------------
-  // TOP 3 SPOTS (awareness only)
+  // TOP 3 SPOTS
   // ----------------------------
   const topSpots = sorted.slice(0, 3).map(r => ({
     spot: r.spot,
     rating: Math.round(r.score / 20),
-    time_window: r.time,
+    time_window: formatTime(r.time),
+    date: formatDate(r.time),
     why_short:
       verdictKey.startsWith("NO")
         ? "Conditions are unsafe"
@@ -124,15 +118,16 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
   }));
 
   // ----------------------------
-  // RETURN HOME PAYLOAD
+  // RETURN PAYLOAD
   // ----------------------------
   return {
     verdict: verdictCopy[verdictKey],
 
     primary: {
       spot: best.spot,
-      time_window: best.time,
-      secondary_time_window: secondary ? secondary.time : null,
+      time_window: formatTime(best.time),
+      date: formatDate(best.time),
+      secondary_time_window: secondary ? formatTime(secondary.time) : null,
       rating: displayRating,
 
       surf_height:
