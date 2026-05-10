@@ -148,8 +148,11 @@ export function getSpotForecast(forecast, rawUserProfile, spotName) {
   // Score all hours for all spots (reuse existing engine)
   const all = getSurfRecommendationsV2(forecast);
 
+  // Normalize apostrophe variants so "d'Ilhas" and "d'Ilhas" both match
+  const normalize = s => s.replace(/[\u2018\u2019\u0027]/g, "'");
+
   // Filter to just the requested spot
-  const spotHours = all.filter(r => r.spot === spotName);
+  const spotHours = all.filter(r => normalize(r.spot) === normalize(spotName));
 
   if (spotHours.length === 0) {
     return { error: `Spot "${spotName}" not found.` };
@@ -161,8 +164,11 @@ export function getSpotForecast(forecast, rawUserProfile, spotName) {
   // Today's best window (first day)
   const today = daily_forecast[0];
 
-  // Static surf guide for this spot
-  const guide = spotGuides[spotName] || null;
+  // Static surf guide for this spot (normalize keys too)
+  const guideKey = Object.keys(spotGuides).find(
+    k => normalize(k) === normalize(spotName)
+  );
+  const guide = guideKey ? spotGuides[guideKey] : null;
 
   return {
     spot: spotName,
