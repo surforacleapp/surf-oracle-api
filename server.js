@@ -4,6 +4,7 @@ import cors from "cors";
 
 import { adaptStormglassForecast } from "./forecastAdapter.js";
 import { getHomeRecommendation } from "./homeOracle.js";
+import { getSpotForecast } from "./spotOracle.js";
 
 const app = express();
 app.use(cors());
@@ -15,33 +16,53 @@ const PORT = process.env.PORT || 3000;
 const FORECAST_URL =
   "https://raw.githubusercontent.com/surforacleapp/homeOracle/main/docs/ericeira.json";
 
-// 🧠 Oracle endpoint
+// ----------------------------
+// 🧠 Home Oracle endpoint
+// POST /home-oracle
+// Body: { ...userProfile }
+// ----------------------------
 app.post("/home-oracle", async (req, res) => {
   try {
     const rawUserProfile = req.body;
 
-    // 1️⃣ Fetch forecast from GitHub
     const response = await fetch(FORECAST_URL);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch forecast JSON from GitHub");
-    }
+    if (!response.ok) throw new Error("Failed to fetch forecast JSON from GitHub");
 
     const json = await response.json();
-
-    // 2️⃣ Adapt forecast to Oracle format
-    const forecast = adaptStormglassForecast({
-      forecast: json.forecast
-    });
-
-    // 3️⃣ Run Oracle brain
+    const forecast = adaptStormglassForecast({ forecast: json.forecast });
     const result = getHomeRecommendation(forecast, rawUserProfile);
 
     res.json(result);
-
   } catch (err) {
-    console.error("Oracle error:", err);
-    res.status(500).json({ error: "Oracle failed." });
+    console.error("Home Oracle error:", err);
+    res.status(500).json({ error: "Home Oracle failed." });
+  }
+});
+
+// ----------------------------
+// 🏄 Spot Forecast endpoint
+// POST /spot-forecast
+// Body: { spot: "Ribeira d'Ilhas", ...userProfile }
+// ----------------------------
+app.post("/spot-forecast", async (req, res) => {
+  try {
+    const { spot, ...rawUserProfile } = req.body;
+
+    if (!spot) {
+      return res.status(400).json({ error: "Missing required field: spot" });
+    }
+
+    const response = await fetch(FORECAST_URL);
+    if (!response.ok) throw new Error("Failed to fetch forecast JSON from GitHub");
+
+    const json = await response.json();
+    const forecast = adaptStormglassForecast({ forecast: json.forecast });
+    const result = getSpotForecast(forecast, rawUserProfile, spot);
+
+    res.json(result);
+  } catch (err) {
+    console.error("Spot Forecast error:", err);
+    res.status(500).json({ error: "Spot Forecast failed." });
   }
 });
 
