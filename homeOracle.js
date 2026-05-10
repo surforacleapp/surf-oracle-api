@@ -105,17 +105,28 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
 
   // ----------------------------
   // TOP 3 SPOTS
+  // Fix: deduplicate by spot name and exclude the primary spot,
+  // so the list always shows 3 distinct alternatives.
   // ----------------------------
-  const topSpots = sorted.slice(0, 3).map(r => ({
-    spot: r.spot,
-    rating: Math.round(r.score / 20),
-    time_window: formatTime(r.time),
-    date: formatDate(r.time),
-    why_short:
-      verdictKey.startsWith("NO")
-        ? "Conditions are unsafe"
-        : r.reasons[0] || ""
-  }));
+  const seenSpots = new Set();
+  const topSpots = [];
+
+  for (const r of sorted) {
+    if (seenSpots.has(r.spot)) continue;       // skip duplicate spots
+    if (r.spot === best.spot) continue;        // exclude primary spot
+    seenSpots.add(r.spot);
+    topSpots.push({
+      spot: r.spot,
+      rating: Math.round(r.score / 20),
+      time_window: formatTime(r.time),
+      date: formatDate(r.time),
+      why_short:
+        verdictKey.startsWith("NO")
+          ? "Conditions are unsafe"
+          : r.reasons[0] || ""
+    });
+    if (topSpots.length === 3) break;
+  }
 
   // ----------------------------
   // RETURN PAYLOAD
