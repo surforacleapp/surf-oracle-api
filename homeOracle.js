@@ -19,6 +19,42 @@ function formatDate(isoString) {
   const date = new Date(isoString);
   return date.toISOString().split("T")[0];
 }
+function buildTimeWindow(hours, primaryThreshold = 60, secondaryThreshold = 50) {
+  // Find all hours above primary threshold
+  const primaryHours = hours
+    .filter(h => h.score >= primaryThreshold)
+    .sort((a, b) => new Date(a.time) - new Date(b.time));
+
+  // Find consecutive block for primary window
+  let primaryStart = null;
+  let primaryEnd = null;
+  if (primaryHours.length > 0) {
+    primaryStart = formatTime(primaryHours[0].time);
+    primaryEnd = formatTime(primaryHours[primaryHours.length - 1].time);
+  }
+
+  // Find secondary window — hours above secondary threshold
+  // that are NOT in the primary block
+  const secondaryHours = hours
+    .filter(h => h.score >= secondaryThreshold && h.score < primaryThreshold)
+    .sort((a, b) => new Date(a.time) - new Date(b.time));
+
+  let secondaryStart = null;
+  let secondaryEnd = null;
+  if (secondaryHours.length > 0) {
+    secondaryStart = formatTime(secondaryHours[0].time);
+    secondaryEnd = formatTime(secondaryHours[secondaryHours.length - 1].time);
+  }
+
+  return {
+    primary: primaryStart && primaryEnd
+      ? `${primaryStart}–${primaryEnd}`
+      : null,
+    secondary: secondaryStart && secondaryEnd
+      ? `${secondaryStart}–${secondaryEnd}`
+      : null
+  };
+}
 
 // ----------------------------
 // Oracle language (v1 locked)
@@ -134,11 +170,14 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
   return {
     verdict: verdictCopy[verdictKey],
 
+    const spotHours = all.filter(r => r.spot === best.spot);
+    const windows = buildTimeWindow(spotHours);
+
     primary: {
       spot: best.spot,
-      time_window: formatTime(best.time),
+      time_window: windows.primary,
       date: formatDate(best.time),
-      secondary_time_window: secondary ? formatTime(secondary.time) : null,
+      secondary_time_window: windows.secondary,
       rating: displayRating,
 
       surf_height:
