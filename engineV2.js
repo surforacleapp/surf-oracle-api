@@ -74,6 +74,7 @@ function scoreHourForSpot(hour, spot) {
   const windSpeed = hour.windSpeed;
   const swellDir = degToCardinal(hour.swellDirection || hour.waveDirection);
   const windDir = degToCardinal(hour.windDirection);
+  const energy = (waveHeight * waveHeight) * wavePeriod;
 
   // --- Size sanity check (São Julião rule) ---
   if (spot.size) {
@@ -142,6 +143,7 @@ function scoreHourForSpot(hour, spot) {
 
   return {
     score: clamp(Math.round(score), 0, 100),
+    energy,
     reasons,
     flags: {
       stormDay
@@ -170,6 +172,7 @@ export function getSurfRecommendationsV2(forecast) {
         swellDirection: hour.swellDirection,
         tide: hour.tide,
         score: scored.score,
+        energy: scored.energy,
         reasons: scored.reasons,
         flags: scored.flags
       });
