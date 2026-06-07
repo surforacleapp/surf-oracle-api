@@ -67,16 +67,40 @@ const verdictCopy = {
   GO_NOW: "SURF IS ON"
 };
 
-const whyShortMap = {
-  NO_ONE:
-    "Powerful storm swell and strong winds. The ocean is not for humans today.",
-  NO_GO:
-    "Conditions are not a good fit for your level. Not recommended.",
-  GO:
-    "Surfable waves with some trade-offs. Manageable with the right timing.",
-  GO_NOW:
-    "Clean, fun conditions during the best window of the day."
-};
+function buildWhyShort(verdictKey, reasons, waveHeight, windSpeed) {
+  if (verdictKey === "NO_ONE") {
+    return "The ocean is not safe today. Sit this one out.";
+  }
+
+  if (verdictKey === "NO_GO") {
+    const reason = reasons?.[0];
+    if (reason === "Poor swell direction") return "The swell isn't hitting the right angle today. Waves will be messy and hard to read.";
+    if (reason === "Unfavorable wind") return "Wind is making a mess of things. Probably not worth the drive.";
+    if (reason === "Strong wind") return "Too much wind today. Conditions will be choppy and frustrating.";
+    if (reason === "Weak swell period") return "Waves will be weak and hard to catch. Good day to rest or cross-train.";
+    if (reason === "Wave size not ideal for this spot") return "Size and spot aren't matching up today. Better options elsewhere.";
+    return "Today's conditions aren't worth rearranging your day for. Better days coming.";
+  }
+
+  if (verdictKey === "GO_NOW") {
+    const reason = reasons?.[0];
+    if (reason === "Good swell direction") return "Swell is coming from a great angle. Waves should have good shape and be easy to read.";
+    if (reason === "Favorable wind") return "Wind is offshore and clean. One of the better mornings this week.";
+    if (reason === "Good swell period") return "The waves will carry more power than they look. Great opportunity to work on your surfing.";
+    if (reason === "Good tide") return "Tide is dialled in for the morning window. Go early.";
+    return "Clean conditions during the best window of the day. Worth showing up for.";
+  }
+
+  if (verdictKey === "GO") {
+    const reason = reasons?.[0];
+    if (reason === "Moderate wind") return "A bit of wind in the mix but still enjoyable. Go early before it picks up.";
+    if (reason === "Poor swell direction") return "Not the cleanest setup today but there are waves to be had. Good for building confidence.";
+    if (reason === "Weak swell period") return "Waves will be softer than ideal. Perfect for beginners looking to practice.";
+    return "Decent conditions with a few trade-offs. Pick the right window and it's worth it.";
+  }
+
+  return "Check conditions before heading out.";
+}
 
 export function getHomeRecommendation(forecast, rawUserProfile) {
   const userProfile = deriveUserProfile(rawUserProfile);
@@ -195,7 +219,7 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
           ? `${Math.round(best.windDirection)}° ${best.windSpeed.toFixed(0)}km/h`
           : "–",
 
-      why_short: whyShortMap[verdictKey]
+      why_short: buildWhyShort(verdictKey, best.reasons, best.waveHeight, best.windSpeed)
     },
 
     top_spots: topSpots,
