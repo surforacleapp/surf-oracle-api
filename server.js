@@ -13,8 +13,22 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 // 🌊 GitHub forecast source (Ericeira for now)
-const FORECAST_URL =
-  "https://raw.githubusercontent.com/surforacleapp/homeOracle/main/docs/ericeira.json";
+const REGION_URLS = {
+  nazare: "https://raw.githubusercontent.com/surforacleapp/homeOracle/main/docs/nazare.json",
+  peniche: "https://raw.githubusercontent.com/surforacleapp/homeOracle/main/docs/peniche.json",
+  ericeira: "https://raw.githubusercontent.com/surforacleapp/homeOracle/main/docs/ericeira.json",
+  lisboa: "https://raw.githubusercontent.com/surforacleapp/homeOracle/main/docs/lisboa.json",
+  cascais: "https://raw.githubusercontent.com/surforacleapp/homeOracle/main/docs/cascais.json",
+  costa_caparica: "https://raw.githubusercontent.com/surforacleapp/homeOracle/main/docs/costa_caparica.json",
+  sines: "https://raw.githubusercontent.com/surforacleapp/homeOracle/main/docs/sines.json",
+};
+
+const DEFAULT_REGION = "ericeira";
+
+function getForecastUrl(region) {
+  const key = region?.toLowerCase().replace(/\s+/g, "_") || DEFAULT_REGION;
+  return REGION_URLS[key] || REGION_URLS[DEFAULT_REGION];
+}
 
 // ----------------------------
 // 🧠 Home Oracle endpoint
@@ -25,7 +39,8 @@ app.post("/home-oracle", async (req, res) => {
   try {
     const rawUserProfile = req.body;
 
-    const response = await fetch(FORECAST_URL);
+    const region = req.body.region || DEFAULT_REGION;
+  const response = await fetch(getForecastUrl(region));
     if (!response.ok) throw new Error("Failed to fetch forecast JSON from GitHub");
 
     const json = await response.json();
@@ -52,7 +67,8 @@ app.post("/spot-forecast", async (req, res) => {
       return res.status(400).json({ error: "Missing required field: spot" });
     }
 
-    const response = await fetch(FORECAST_URL);
+    const region = req.body.region || DEFAULT_REGION;
+  const response = await fetch(getForecastUrl(region));
     if (!response.ok) throw new Error("Failed to fetch forecast JSON from GitHub");
 
     const json = await response.json();
