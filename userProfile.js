@@ -24,26 +24,69 @@ export function deriveUserProfile(raw) {
   if (raw.boardSize === "6_6_to_7_2") score += 1;
   if (raw.boardSize === "5_0_to_6_6") score += 2;
 
-  // --- Nose shape (only if mid-size board) ---
-  if (
-    raw.boardSize === "6_6_to_7_2" &&
-    raw.noseShape === "pointed"
-  ) {
+  // --- Nose shape ---
+  if (raw.noseShape === "pointed") {
     score += 1;
   }
 
-  // --- Level decision ---
-  const level = score >= 7 ? "intermediate" : "beginner";
+  // --- Level decision (4 levels) ---
+  let level;
+  if (score >= 10) {
+    level = "advanced";
+  } else if (score >= 7) {
+    level = "advanced_intermediate";
+  } else if (score >= 4) {
+    level = "intermediate";
+  } else {
+    level = "beginner";
+  }
 
-  // --- Safety & comfort limits ---
-  const comfort =
-    level === "beginner"
-      ? { maxWaveHeight: 1.4, maxEnergy: 1200 }
-      : { maxWaveHeight: 2.0, maxEnergy: 2000 };
+  // --- Comfort & danger matrices (dynamic per level) ---
+  const comfort = {
+    beginner: {
+      maxWaveHeight: 1.2,
+      maxEnergy: 1000,
+      maxWindSpeed: 20,
+      idealPeriod: { min: 8, max: 14 }
+    },
+    intermediate: {
+      maxWaveHeight: 2.0,
+      maxEnergy: 2000,
+      maxWindSpeed: 25,
+      idealPeriod: { min: 7, max: 16 }
+    },
+    advanced_intermediate: {
+      maxWaveHeight: 3.0,
+      maxEnergy: 4000,
+      maxWindSpeed: 30,
+      idealPeriod: { min: 6, max: 18 }
+    },
+    advanced: {
+      maxWaveHeight: 5.0,
+      maxEnergy: 8000,
+      maxWindSpeed: 40,
+      idealPeriod: { min: 5, max: 20 }
+    }
+  }[level];
+
+  // --- Risk appetite ---
+  let riskAppetite;
+  if (raw.riskAppetite === "adventurous") {
+    riskAppetite = "adventurous";
+  } else if (raw.riskAppetite === "moderate") {
+    riskAppetite = "moderate";
+  } else {
+    riskAppetite = "conservative";
+  }
+
+  // --- User goals ---
+  const goals = raw.goals || ["have_fun"];
 
   return {
     level,
     confidenceScore: score,
-    comfort
+    comfort,
+    riskAppetite,
+    goals
   };
 }
