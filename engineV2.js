@@ -27,39 +27,9 @@ function clamp(val, min, max) {
 // Spots (v2)
 // ----------------------------
 
-const spots = [
-  {
-    name: "Ribeira d’Ilhas",
-    swell: ["NW","WNW","W"],
-    wind: ["E","NE","N"],
-    bestTide: ["mid"]
-  },
-  {
-    name: "São Julião",
-    swell: ["NW","W"],
-    wind: ["E","NE"],
-    bestTide: ["low","mid"],
-    size: { min: 1.0, max: 2.0 }
-  },
-  {
-    name: "Foz do Lizandro",
-    swell: ["SW","W","NW"],
-    wind: ["E","SE","NE"],
-    bestTide: ["mid"]
-  },
-  {
-    name: "Matadouro",
-    swell: ["NW","WNW","W"],
-    wind: ["E","SE","NE"],
-    bestTide: ["mid","high"]
-  },
-  {
-    name: "Praia do Sul",
-    swell: ["SW","WSW","W"],
-    wind: ["E","NE","N"],
-    bestTide: ["mid"]
-  }
-];
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const { spots } = require("./spots.json");
 
 // ----------------------------
 // Core scoring per hour & spot
