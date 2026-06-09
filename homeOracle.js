@@ -101,6 +101,35 @@ function buildWhyShort(verdictKey, reasons, waveHeight, windSpeed) {
 
   return "Check conditions before heading out.";
 }
+function buildSpotWhyShort(score, reasons) {
+  const topReason = reasons?.[0] || "";
+
+  if (score >= 50) {
+    if (topReason === "Good swell direction") return "Swell angle is working here. Worth checking.";
+    if (topReason === "Favorable wind") return "Wind is offshore. Conditions are holding together.";
+    if (topReason === "Good swell period") return "Decent period — waves will have some punch.";
+    if (topReason === "Good tide") return "Tide is helping here. Could be worth the drive.";
+    return "Conditions are reasonable. Check before you go.";
+  }
+
+  if (score >= 30) {
+    if (topReason === "Poor swell direction") return "Swell isn't hitting the right angle today. Waves will be messy.";
+    if (topReason === "Unfavorable wind") return "Wind is onshore here. Conditions will be choppy.";
+    if (topReason === "Strong wind") return "Too much wind for this spot today.";
+    if (topReason === "Weak swell period") return "Short period swell — waves will lack shape and power.";
+    if (topReason === "Wave size not ideal for this spot") return "Size isn't matching what this spot needs today.";
+    if (topReason === "Moderate wind") return "Wind is picking up here. Will get messy through the day.";
+    return "Not ideal today — conditions aren't clicking for this spot.";
+  }
+
+  // score < 30
+  if (topReason === "Poor swell direction") return "Wrong swell angle entirely. This spot needs different conditions.";
+  if (topReason === "Unfavorable wind") return "Onshore wind is wrecking this spot today. Come back another day.";
+  if (topReason === "Strong wind") return "Wind is too strong for this spot. Not worth it.";
+  if (topReason === "Storm conditions") return "Storm conditions. Not safe today.";
+  if (topReason === "Weak swell period") return "Swell has no energy today. Waves will be weak and hard to catch.";
+  return "Conditions aren't working for this spot today. Better options elsewhere.";
+}
 
 export function getHomeRecommendation(forecast, rawUserProfile) {
   const userProfile = deriveUserProfile(rawUserProfile);
@@ -170,19 +199,21 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
   const seenSpots = new Set();
   const topSpots = [];
 
+  // Also exclude secondary spot from top 3 to avoid duplicates
+  const secondarySpotName = secondary?.spot || null;
+
   for (const r of sorted) {
-    if (seenSpots.has(r.spot)) continue;       // skip duplicate spots
-    if (r.spot === best.spot) continue;        // exclude primary spot
+    if (seenSpots.has(r.spot)) continue;
+    if (r.spot === best.spot) continue;
+    if (r.spot === secondarySpotName && topSpots.length === 0) continue;
     seenSpots.add(r.spot);
     topSpots.push({
       spot: r.spot,
       rating: Math.round(r.score / 20),
       time_window: formatTime(r.time),
       date: formatDate(r.time),
-      why_short:
-        verdictKey.startsWith("NO")
-          ? "Conditions are unsafe"
-          : r.reasons[0] || ""
+      score: r.score,
+      why_short: buildSpotWhyShort(r.score, r.reasons)
     });
     if (topSpots.length === 3) break;
   }
