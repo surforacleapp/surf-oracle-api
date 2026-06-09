@@ -1,0 +1,362 @@
+{
+  "spots": [
+    {
+      "name": "Ribeira d'Ilhas",
+      "region": "ericeira",
+      "type": "Beach & reef break",
+      "swell": [
+        "NW",
+        "WNW",
+        "W"
+      ],
+      "wind": [
+        "E",
+        "NE",
+        "N"
+      ],
+      "bestTide": [
+        "mid"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 4
+      },
+      "hazards": [
+        "Rocks",
+        "Strong currents on bigger days"
+      ],
+      "bottom": "Rock and sand",
+      "consistency": "high",
+      "crowd": "high",
+      "notes": "One of Ericeira's most consistent spots. Protected shape handles northerly wind better than open beaches. Powerful waves on bigger swells — not ideal for beginners above 2m."
+    },
+    {
+      "name": "São Julião",
+      "region": "ericeira",
+      "type": "Beach break",
+      "swell": [
+        "NW",
+        "W"
+      ],
+      "wind": [
+        "E",
+        "NE"
+      ],
+      "bestTide": [
+        "low",
+        "mid"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 2
+      },
+      "hazards": [
+        "Gets crowded on good days"
+      ],
+      "bottom": "Sand",
+      "consistency": "medium",
+      "crowd": "medium",
+      "notes": "Forgiving beach break. Great for beginners and intermediates. Gets messy and closes out above 2m."
+    },
+    {
+      "name": "Foz do Lizandro",
+      "region": "ericeira",
+      "type": "River mouth beach break",
+      "swell": [
+        "SW",
+        "W",
+        "NW"
+      ],
+      "wind": [
+        "E",
+        "SE",
+        "NE"
+      ],
+      "bestTide": [
+        "mid"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "hazards": [
+        "Shifting sandbars",
+        "River current after rain"
+      ],
+      "bottom": "Sand",
+      "consistency": "medium",
+      "crowd": "low",
+      "notes": "Mellow and consistent. Good option when other spots are too big. River mouth creates fun shifting sandbars."
+    },
+    {
+      "name": "Matadouro",
+      "region": "ericeira",
+      "type": "Beach break",
+      "swell": [
+        "NW",
+        "WNW",
+        "W"
+      ],
+      "wind": [
+        "E",
+        "SE",
+        "NE"
+      ],
+      "bestTide": [
+        "mid",
+        "high"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 3
+      },
+      "hazards": [
+        "Powerful shore break at high tide"
+      ],
+      "bottom": "Sand",
+      "consistency": "medium",
+      "crowd": "low",
+      "notes": "Powerful and punchy. Good intermediate spot when Ribeira is too crowded. Works well mid to high tide."
+    },
+    {
+      "name": "Praia do Sul",
+      "region": "ericeira",
+      "type": "Beach break",
+      "swell": [
+        "SW",
+        "WSW",
+        "W"
+      ],
+      "wind": [
+        "E",
+        "NE",
+        "N"
+      ],
+      "bestTide": [
+        "mid"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "hazards": [
+        "Rocks on the sides"
+      ],
+      "bottom": "Sand",
+      "consistency": "medium",
+      "crowd": "low",
+      "notes": "Reliable option when swell has a southerly component. Relaxed atmosphere. Good for intermediates."
+    },
+    {
+      "name": "Supertubos",
+      "region": "peniche",
+      "type": "Beach break",
+      "swell": [
+        "NW",
+        "WNW",
+        "W"
+      ],
+      "wind": [
+        "E",
+        "NE",
+        "SE"
+      ],
+      "bestTide": [
+        "low",
+        "mid"
+      ],
+      "size": {
+        "min": 1,
+        "max": 5
+      },
+      "hazards": [
+        "Heavy barrels",
+        "Strong currents",
+        "Dangerous shore break"
+      ],
+      "bottom": "Sand",
+      "consistency": "high",
+      "crowd": "high",
+      "notes": "World-class beach break. One of Europe's heaviest waves. Not for beginners or intermediates. Best on a solid NW swell with light easterly wind."
+    },
+    {
+      "name": "Baleal",
+      "region": "peniche",
+      "type": "Beach break",
+      "swell": [
+        "NW",
+        "W",
+        "SW"
+      ],
+      "wind": [
+        "E",
+        "NE",
+        "SE"
+      ],
+      "bestTide": [
+        "mid",
+        "high"
+      ],
+      "size": {
+        "min": 0.3,
+        "max": 2
+      },
+      "hazards": [
+        "Rocks near the island"
+      ],
+      "bottom": "Sand",
+      "consistency": "high",
+      "crowd": "medium",
+      "notes": "Protected and consistent. Great for beginners and intermediates. Works in most swells due to the bay shape. Popular surf school spot."
+    },
+    {
+      "name": "Praia de Carcavelos",
+      "region": "cascais",
+      "type": "Beach break",
+      "swell": [
+        "SW",
+        "W",
+        "NW"
+      ],
+      "wind": [
+        "N",
+        "NE",
+        "E"
+      ],
+      "bestTide": [
+        "mid"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "hazards": [
+        "Crowded year round",
+        "Rips on bigger days"
+      ],
+      "bottom": "Sand",
+      "consistency": "high",
+      "crowd": "very high",
+      "notes": "Most accessible surf spot near Lisbon. Consistent and beginner-friendly on smaller days. Gets crowded fast. Watch for rips above 1.5m."
+    },
+    {
+      "name": "Praia do Guincho",
+      "region": "cascais",
+      "type": "Beach break",
+      "swell": [
+        "NW",
+        "W",
+        "SW"
+      ],
+      "wind": [
+        "E",
+        "NE"
+      ],
+      "bestTide": [
+        "mid"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 3
+      },
+      "hazards": [
+        "Strong winds",
+        "Powerful rips",
+        "Remote location"
+      ],
+      "bottom": "Sand",
+      "consistency": "medium",
+      "crowd": "low",
+      "notes": "Exposed and powerful. Rarely without wind but when it's offshore it's excellent. Intermediates and above. Not beginner-friendly."
+    },
+    {
+      "name": "Costa de Caparica",
+      "region": "costa_caparica",
+      "type": "Beach break",
+      "swell": [
+        "SW",
+        "W",
+        "NW"
+      ],
+      "wind": [
+        "N",
+        "NE",
+        "E"
+      ],
+      "bestTide": [
+        "mid"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 3
+      },
+      "hazards": [
+        "Rips between sandbanks",
+        "Crowded in summer"
+      ],
+      "bottom": "Sand",
+      "consistency": "high",
+      "crowd": "high",
+      "notes": "Long stretch of beach with multiple peaks. Something for every level depending on the bank. Best sandbars usually found by walking away from the main access points."
+    },
+    {
+      "name": "Fonte da Telha",
+      "region": "costa_caparica",
+      "type": "Beach break",
+      "swell": [
+        "SW",
+        "W",
+        "NW"
+      ],
+      "wind": [
+        "N",
+        "NE",
+        "E"
+      ],
+      "bestTide": [
+        "mid",
+        "low"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 3
+      },
+      "hazards": [
+        "Remote — limited facilities"
+      ],
+      "bottom": "Sand",
+      "consistency": "medium",
+      "crowd": "low",
+      "notes": "Quieter alternative to Caparica main beach. Worth the extra drive when Caparica is crowded. Similar conditions, fewer people."
+    },
+    {
+      "name": "Praia de São João da Caparica",
+      "region": "lisboa",
+      "type": "Beach break",
+      "swell": [
+        "SW",
+        "W",
+        "NW"
+      ],
+      "wind": [
+        "N",
+        "NE",
+        "E"
+      ],
+      "bestTide": [
+        "mid"
+      ],
+      "size": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "hazards": [
+        "Urban beach — water quality varies"
+      ],
+      "bottom": "Sand",
+      "consistency": "medium",
+      "crowd": "medium",
+      "notes": "Accessible from Lisbon. Good on smaller SW swells. Check water quality after heavy rain."
+    }
+  ]
+}
