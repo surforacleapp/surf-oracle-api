@@ -110,9 +110,8 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
   const best = sorted[0];
 
   const secondary = sorted.find(r =>
-    r.spot === best.spot &&
-    r.time !== best.time &&
-    r.score >= best.score - 10
+    r.spot !== best.spot &&
+    r.score >= best.score - 15
   );
 
   // ----------------------------
