@@ -131,23 +131,42 @@ function scoreHourForSpot(hour, spot) {
     }
   }
 
-  // --- Global storm detection ---
+  // --- Storm detection (level-aware) ---
   const stormDay =
     waveHeight >= 4 ||
     windSpeed >= 35;
 
-  if (stormDay) {
+  const heavyDay =
+    waveHeight >= 2.5 ||
+    windSpeed >= 25;
+
+  // Pass userLevel into scoring if available
+  const level = hour.userLevel || "beginner";
+
+  if (stormDay && level === "beginner") {
     score = Math.min(score, 15);
-    reasons.push("Storm conditions");
+    reasons.push("Storm conditions — not safe for beginners");
+  } else if (stormDay && level === "intermediate") {
+    score = Math.min(score, 15);
+    reasons.push("Storm conditions — experienced surfers only");
+  } else if (stormDay && (level === "advanced_intermediate" || level === "advanced")) {
+    score = Math.min(score, 40);
+    reasons.push("Storm conditions — challenging but manageable for experienced surfers");
+  } else if (heavyDay && level === "beginner") {
+    score = Math.min(score, 25);
+    reasons.push("Heavy conditions — not recommended for beginners");
   }
+
+  const flags = {
+    stormDay,
+    heavyDay
+  };
 
   return {
     score: clamp(Math.round(score), 0, 100),
     energy,
     reasons,
-    flags: {
-      stormDay
-    }
+    flags
   };
 }
 
