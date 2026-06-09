@@ -67,7 +67,9 @@ const verdictCopy = {
   GO_NOW: "SURF IS ON"
 };
 
-function buildWhyShort(verdictKey, reasons, waveHeight, windSpeed) {
+function buildWhyShort(verdictKey, reasons, waveHeight, windSpeed, goals) {
+  const goal = goals?.[0] || "have_fun";
+
   if (verdictKey === "NO_ONE") {
     return "The ocean is not safe today. Sit this one out.";
   }
@@ -84,6 +86,21 @@ function buildWhyShort(verdictKey, reasons, waveHeight, windSpeed) {
 
   if (verdictKey === "GO_NOW") {
     const reason = reasons?.[0];
+    // Goal-aware GO_NOW copy
+    if (goal === "improve") {
+      if (reason === "Good swell direction") return "Clean swell angle and organised waves — perfect for working on your surfing.";
+      if (reason === "Good swell period") return "Powerful, well-spaced waves. Great opportunity to push your limits.";
+      return "Quality conditions today. Good day to focus on technique.";
+    }
+    if (goal === "stay_safe") {
+      if (reason === "Good swell direction") return "Swell is coming from a great angle. Waves should be easy to read and manageable.";
+      return "Clean conditions and predictable waves. A comfortable session today.";
+    }
+    if (goal === "challenge") {
+      if (reason === "Good swell period") return "Powerful waves with real energy — exactly what you're looking for.";
+      return "Solid conditions. Push yourself today.";
+    }
+    // Default have_fun
     if (reason === "Good swell direction") return "Swell is coming from a great angle. Waves should have good shape and be easy to read.";
     if (reason === "Favorable wind") return "Wind is offshore and clean. One of the better mornings this week.";
     if (reason === "Good swell period") return "The waves will carry more power than they look. Great opportunity to work on your surfing.";
@@ -93,6 +110,15 @@ function buildWhyShort(verdictKey, reasons, waveHeight, windSpeed) {
 
   if (verdictKey === "GO") {
     const reason = reasons?.[0];
+    if (goal === "improve") {
+      if (reason === "Moderate wind") return "Some wind in the mix — good practice for reading messier conditions.";
+      return "Not perfect but there's something to work with. Good training day.";
+    }
+    if (goal === "stay_safe") {
+      if (reason === "Moderate wind") return "A bit of wind but manageable. Go early before it picks up.";
+      return "Decent conditions. Nothing to worry about if you pick the right window.";
+    }
+    // Default
     if (reason === "Moderate wind") return "A bit of wind in the mix but still enjoyable. Go early before it picks up.";
     if (reason === "Poor swell direction") return "Not the cleanest setup today but there are waves to be had. Good for building confidence.";
     if (reason === "Weak swell period") return "Waves will be softer than ideal. Perfect for beginners looking to practice.";
@@ -144,50 +170,58 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
   );
 
   // ----------------------------
-  // GLOBAL DANGER
+  // GLOBAL DANGER (level-aware)
   // ----------------------------
+  const dangerThresholds = {
+    beginner:              { maxWaveHeight: 1.2, maxEnergy: 1000 },
+    intermediate:          { maxWaveHeight: 2.0, maxEnergy: 2000 },
+    advanced_intermediate: { maxWaveHeight: 3.0, maxEnergy: 4000 },
+    advanced:              { maxWaveHeight: 5.0, maxEnergy: 8000 }
+  };
+
+  const threshold = dangerThresholds[userProfile.level] || dangerThresholds.beginner;
+
+  // Risk appetite modifies thresholds
+  const riskMultiplier =
+    userProfile.riskAppetite === "adventurous" ? 1.3 :
+    userProfile.riskAppetite === "conservative" ? 0.8 : 1.0;
+
+  const effectiveMaxHeight = threshold.maxWaveHeight * riskMultiplier;
+  const effectiveMaxEnergy = threshold.maxEnergy * riskMultiplier;
+
   const globalDanger =
     best.flags?.stormDay === true ||
-    best.waveHeight >= 3.0 ||
-    best.energy >= 3000;
+    best.waveHeight >= effectiveMaxHeight ||
+    (best.energy != null && best.energy >= effectiveMaxEnergy);
 
   // ----------------------------
-  // VERDICT
+  // VERDICT (4 levels + risk aware)
   // ----------------------------
   let verdictKey = "NO_GO";
 
   if (globalDanger) {
     verdictKey = "NO_ONE";
-  }
-  else if (
-    userProfile.level === "beginner" &&
-    (
-      best.waveHeight > userProfile.comfort.maxWaveHeight ||
-      best.energy > userProfile.comfort.maxEnergy
-    )
+  } else if (
+    best.waveHeight > effectiveMaxHeight ||
+    (best.energy != null && best.energy > effectiveMaxEnergy)
   ) {
     verdictKey = "NO_GO";
-  }
-  else if (best.score >= 70) {
+  } else if (best.score >= 70) {
     verdictKey = "GO_NOW";
-  }
-  else if (best.score >= 40) {
+  } else if (best.score >= 40) {
     verdictKey = "GO";
   }
 
   // ----------------------------
-  // UI RATING
+  // UI RATING (level-aware)
   // ----------------------------
   let displayRating = Math.round(best.score / 20);
 
   if (globalDanger) {
-    displayRating = Math.min(displayRating, 2);
+    displayRating = Math.min(displayRating, 1);
   }
 
-  if (
-    userProfile.level === "beginner" &&
-    verdictKey !== "GO_NOW"
-  ) {
+  if (verdictKey === "NO_GO") {
     displayRating = Math.min(displayRating, 2);
   }
 
@@ -249,7 +283,7 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
           ? `${Math.round(best.windDirection)}° ${best.windSpeed.toFixed(0)}km/h`
           : "–",
 
-      why_short: buildWhyShort(verdictKey, best.reasons, best.waveHeight, best.windSpeed)
+      why_short: buildWhyShort(verdictKey, best.reasons, best.waveHeight, best.windSpeed, userProfile.goals)
     },
 
     top_spots: topSpots,
@@ -257,7 +291,11 @@ export function getHomeRecommendation(forecast, rawUserProfile) {
     meta: {
       userLevel: userProfile.level,
       confidenceScore: userProfile.confidenceScore,
-      globalDanger
+      riskAppetite: userProfile.riskAppetite,
+      goals: userProfile.goals,
+      globalDanger,
+      effectiveMaxHeight: Math.round(effectiveMaxHeight * 10) / 10,
+      effectiveMaxEnergy: Math.round(effectiveMaxEnergy)
     }
   };
 }
