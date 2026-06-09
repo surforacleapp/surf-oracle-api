@@ -11,48 +11,22 @@ import { deriveUserProfile } from "./userProfile.js";
 // TODO: expand copy for each spot, translate to Oracle voice
 // ----------------------------
 
-const spotGuides = {
-  "Ribeira d'Ilhas": {
-    type: "Beach & reef break",
-    ideal_swell: "NW 1.5–3m, 12s+",
-    ideal_wind: "E or NE offshore",
-    ideal_tide: "Mid tide",
-    crowd: "Can get busy on good days",
-    notes: "One of Ericeira's most consistent spots. Works best on a solid NW swell with light easterly winds. Powerful waves — not ideal for beginners on bigger days.",
-  },
-  "São Julião": {
-    type: "Beach break",
-    ideal_swell: "NW–W 1–2m",
-    ideal_wind: "E or NE offshore",
-    ideal_tide: "Low to mid tide",
-    crowd: "Moderate",
-    notes: "Forgiving beach break, great for beginner and intermediate surfers. Gets messy above 2m. Best on smaller, clean NW swells.",
-  },
-  "Foz do Lizandro": {
-    type: "River mouth beach break",
-    ideal_swell: "SW–NW 1–2m",
-    ideal_wind: "E or SE offshore",
-    ideal_tide: "Mid tide",
-    crowd: "Usually quiet",
-    notes: "Mellow and consistent. The river mouth creates shifting sandbars that can produce fun, hollow sections. Good option when other spots are too big.",
-  },
-  "Matadouro": {
-    type: "Beach break",
-    ideal_swell: "NW–WNW 1.5–3m",
-    ideal_wind: "E or SE offshore",
-    ideal_tide: "Mid to high tide",
-    crowd: "Less crowded than Ribeira",
-    notes: "Powerful and punchy. Works well at mid to high tide on a solid NW swell. Good intermediate spot when Ribeira is too crowded.",
-  },
-  "Praia do Sul": {
-    type: "Beach break",
-    ideal_swell: "SW–W 1–2m",
-    ideal_wind: "E or NE offshore",
-    ideal_tide: "Mid tide",
-    crowd: "Usually quiet",
-    notes: "A reliable option when the swell has a southerly component. Relaxed atmosphere and forgiving waves make it a solid choice for intermediate surfers.",
-  },
-};
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const { spots: allSpots } = require("./spots.json");
+
+const spotGuides = {};
+allSpots.forEach(spot => {
+  spotGuides[spot.name] = {
+    type: spot.type,
+    ideal_swell: spot.swell.join("/"),
+    ideal_wind: spot.wind.join("/"),
+    ideal_tide: spot.bestTide.join("/"),
+    crowd: spot.crowd,
+    notes: spot.notes,
+    hazards: spot.hazards
+  };
+});
 
 // ----------------------------
 // Helpers
