@@ -34,10 +34,10 @@ export function adaptStormglassForecast(raw) {
     windSpeed: pick(hour.windSpeed, ["sg", "noaa", "ecmwf"]),
     windDirection: pick(hour.windDirection, ["sg", "noaa", "ecmwf"]),
 
-    // --- Tide (placeholder for v1) ---
+    // --- Tide (reads tide_phase from stormglass_fetch.py) ---
     tide: {
       height: null,
-      phase: null
+      phase: hour.tide_phase || null
     }
   }));
 }
