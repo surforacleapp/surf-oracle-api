@@ -69,18 +69,26 @@ export function deriveUserProfile(raw) {
     }
   }[level];
 
-  // --- Risk appetite ---
-  let riskAppetite;
-  if (raw.riskAppetite === "adventurous") {
-    riskAppetite = "adventurous";
-  } else if (raw.riskAppetite === "moderate") {
-    riskAppetite = "moderate";
-  } else {
-    riskAppetite = "conservative";
-  }
+// --- User goals ---
+    const goals = raw.goals || ["have_fun"];
+    const primaryGoal = Array.isArray(goals) ? goals[0] : goals;
 
-  // --- User goals ---
-  const goals = raw.goals || ["have_fun"];
+    // --- Risk appetite (auto-derived from goals) ---
+    // Can be overridden by explicit riskAppetite field if provided
+    let riskAppetite;
+    if (raw.riskAppetite) {
+          // Explicit override — respect it
+          riskAppetite = raw.riskAppetite;
+    } else {
+          // Auto-derive from goals
+          if (primaryGoal === "challenge") {
+                  riskAppetite = "adventurous";
+          } else if (primaryGoal === "improve") {
+                  riskAppetite = "moderate";
+          } else {
+                  riskAppetite = "conservative"; // have_fun default
+          }
+    }
 
   return {
     level,
